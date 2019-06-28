@@ -1,11 +1,16 @@
 const express = require('express')
 const mongo = require('mongodb').MongoClient
-const app = express()
+
+// Create a router for this manager
+var router = express.Router();
 
 var url = "mongodb://localhost:27017/";
 
+// Export this router so the server entry point can call it
+module.exports = router
+
 // use :name to specify id in the path param
-app.get('/user/:name', (request, response) => {
+router.get('/user/:name', (request, response) => {
     mongo.connect(url, function(err, client) {
       if (err) throw err;
   
