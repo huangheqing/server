@@ -4,12 +4,12 @@ const app = express()
 
 var url = "mongodb://localhost:27017/";
 
-// use :id to specify id in the path param
+// use :name to specify id in the path param
 app.get('/user/:name', (request, response) => {
     mongo.connect(url, function(err, client) {
       if (err) throw err;
   
-      // the :id can be retrieved by calling request.params.id
+      // the :name can be retrieved by calling request.params.name
       var query = { name: request.params.name };
   
       // In this mongo version function db and close has been moved to function client
