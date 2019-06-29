@@ -1,13 +1,34 @@
 const express = require('express');
-const mongo = require('mongodb').MongoClient;
+const bcrypt = require('bcrypt');
+const session = require('express-session');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
 // Create a router for this manager
 var router = express.Router();
+var sess; // global session not recommended
+router.use(bodyParser.urlencoded({ extended: true }));
+
+var sessionChecker = (req, res, next) => {
+  if (req.session.username) {
+    res.redirect('/dashboard');
+  } else {
+    next();
+  }
+};
 
 // Mongoose schema for user
 mongoose.connect('mongodb://localhost:27017/city');
+
+//use sessions for tracking logins
+router.use(
+  session({
+    secret: 'work hard',
+    resave: true,
+    saveUninitialized: true,
+    cookie: { secure: true },
+  })
+);
 
 // Creation on schema
 var UserSchema = new mongoose.Schema({
@@ -27,61 +48,135 @@ var UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  level: Number,
+  exp: Number,
   Money: Number,
+});
+
+//hashing a password before saving it to the database
+UserSchema.pre('save', function(next) {
+  var user = this;
+  bcrypt.hash(user.password, 10, function(err, hash) {
+    if (err) {
+      return next(err);
+    }
+    user.password = hash;
+    next();
+  });
 });
 
 // Create table + model
 var User = mongoose.model('User', UserSchema, 'user');
 module.exports = User;
 
-var url = 'mongodb://localhost:27017/';
-
 // Export this router so the server entry point can call it
 module.exports = router;
 
-// use :name to specify id in the path param
-router.get('/user/:name', (request, response) => {
-  mongo.connect(url, function(err, client) {
-    if (err) throw err;
-
-    // the :name can be retrieved by calling request.params.name
-    var query = { name: request.params.name };
-
-    // In this mongo version function db and close has been moved to function client
-    var db = client.db('city');
-    db.collection('city')
-      .find(query)
-      .toArray(function(err, result) {
-        if (err) throw err;
-        console.log(result);
-        response.send(result);
-        client.close();
-      });
-  });
+router.get('/', sessionChecker, (req, res) => {
+  res.redirect('/login');
 });
 
-// Function to create user
-// Need to use bodyParser.json() to tell this endpoint to accept Json post request
-router.post('/user/create', bodyParser.json(), function(req, res) {
-  console.log('Creating user');
-  console.log('Connection Successful!');
-  // Check req.body necessary fields
-  if (req.body.email && req.body.username && req.body.password) {
-    var userData = {
-      email: req.body.email,
-      username: req.body.username,
-      password: req.body.password,
-    };
-    console.log('Start creating');
-    //use schema.create to insert data into the db
-    User.update(userData, function(err, user) {
-      console.log('Inserting');
+router.get('/dashboard', (req, res) => {
+  if (req.session.user && req.cookies.user_sid) {
+    res.sendFile(__dirname + '/public/dashboard.html');
+  } else {
+    res.redirect('/login');
+  }
+});
+
+// use :id to specify id in the path param
+router.get('/user/:id', (req, res) => {
+  sess = req.session;
+  if (sess.username) {
+    // the :id can be retrieved by calling request.params.id
+    User.findById({ _id: req.params.id }, function(err, user) {
+      console.log('get user by id');
       if (err) {
         console.log(err);
         return next(err);
       } else {
-        return res.send('done');
+        res.send(user);
+      }
+    });
+  } else {
+    return res.redirect('/login');
+  }
+});
+
+// Function to create user
+// Need to use bodyParser.json() to tell this endpoint to accept Json post request
+router
+  .route('/signup')
+  .get(sessionChecker, (req, res) => {
+    res.sendFile(__dirname + '/client/signup.html');
+  })
+  .post(function(req, res) {
+    console.log('Creating user');
+    console.log('Connection Successful!');
+    // Check req.body necessary fields
+    if (req.body.email && req.body.username && req.body.password) {
+      var userData = {
+        email: req.body.email,
+        username: req.body.username,
+        password: req.body.password,
+      };
+      console.log('Start creating');
+      //use schema.create to insert data into the db
+      User.create(userData, function(err, user) {
+        console.log('Inserting');
+        if (err) {
+          console.log(err);
+          return next(err);
+        } else {
+          return res.redirect('/dashboard');
+        }
+      });
+    } else {
+      console.log('Signup failed');
+    }
+  });
+
+router
+  .route('/login')
+  .get(sessionChecker, (req, res) => {
+    res.sendFile(__dirname + '/client/login.html');
+  })
+  .post(function(req, res) {
+    username = req.body.username;
+    password = req.body.password;
+    console.log('login user: ' + username);
+    User.findOne({ username: username }).exec(function(err, user) {
+      if (err) {
+        return res.send(err);
+      } else if (!user) {
+        var err = new Error('User not found.');
+        err.status = 401;
+        return res.send(err);
+      }
+      bcrypt.compare(password, user.password, function(err, result) {
+        if (result === true) {
+          sess = req.session;
+          sess.username = req.body.username;
+          console.log(sess);
+          console.log('Successfully logged in' + user);
+          res.redirect('/user/' + user._id);
+        } else {
+          return res.send(
+            'Not able to login, Please check your username and password'
+          );
+        }
+      });
+    });
+  });
+
+// GET /logout
+router.get('/logout', function(req, res, next) {
+  if (req.session) {
+    // delete session object
+    req.session.destroy(function(err) {
+      if (err) {
+        return next(err);
+      } else {
+        return res.redirect('/login');
       }
     });
   }
