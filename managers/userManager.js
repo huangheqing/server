@@ -2,15 +2,32 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
 const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
 // Create a router for this manager
 var router = express.Router();
-var sess; // global session not recommended
 router.use(bodyParser.urlencoded({ extended: true }));
+//use sessions for tracking logins
+router.use(
+  session({
+    key: 'user_sid',
+    secret: 'work hard',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { expires: 6000000000 },
+  })
+);
+router.use(cookieParser());
+router.use((req, res, next) => {
+  if (req.cookies.user_sid && !req.session.user) {
+    res.clearCookie('user_sid');
+  }
+  next();
+});
 
 var sessionChecker = (req, res, next) => {
-  if (req.session.username) {
+  if (req.session.user && req.cookies.user_sid) {
     res.redirect('/dashboard');
   } else {
     next();
@@ -19,16 +36,6 @@ var sessionChecker = (req, res, next) => {
 
 // Mongoose schema for user
 mongoose.connect('mongodb://localhost:27017/city');
-
-//use sessions for tracking logins
-router.use(
-  session({
-    secret: 'work hard',
-    resave: true,
-    saveUninitialized: true,
-    cookie: { secure: true },
-  })
-);
 
 // Creation on schema
 var UserSchema = new mongoose.Schema({
@@ -77,7 +84,8 @@ router.get('/', sessionChecker, (req, res) => {
 
 router.get('/dashboard', (req, res) => {
   if (req.session.user && req.cookies.user_sid) {
-    res.sendFile(__dirname + '/public/dashboard.html');
+    console.log(req.session);
+    res.sendFile(__dirname + '/client/dashboard.html');
   } else {
     res.redirect('/login');
   }
@@ -85,8 +93,7 @@ router.get('/dashboard', (req, res) => {
 
 // use :id to specify id in the path param
 router.get('/user/:id', (req, res) => {
-  sess = req.session;
-  if (sess.username) {
+  if (req.session.username) {
     // the :id can be retrieved by calling request.params.id
     User.findById({ _id: req.params.id }, function(err, user) {
       console.log('get user by id');
@@ -127,7 +134,7 @@ router
           console.log(err);
           return next(err);
         } else {
-          return res.redirect('/dashboard');
+          return res.redirect('/login');
         }
       });
     } else {
@@ -154,11 +161,10 @@ router
       }
       bcrypt.compare(password, user.password, function(err, result) {
         if (result === true) {
-          sess = req.session;
-          sess.username = req.body.username;
-          console.log(sess);
+          req.session.user = req.body;
+          console.log(req.session);
           console.log('Successfully logged in' + user);
-          res.redirect('/user/' + user._id);
+          return res.redirect('/dashboard');
         } else {
           return res.send(
             'Not able to login, Please check your username and password'

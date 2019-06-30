@@ -31,6 +31,7 @@
   "dependencies": {
     "bcrypt": "^3.0.6",
     "body-parser": "^1.15.2",
+    "bootstrap": "^4.3.1",
     "compression": "^1.6.2",
     "connect-redis": "^3.3.0",
     "cookie-parser": "^1.4.3",
@@ -53,6 +54,7 @@
     "path-to-regexp": "^0.1.7",
     "prettier": "^1.18.2",
     "pug": "^2.0.0-rc.4",
+    "react-bootstrap": "^1.0.0-beta.9",
     "response-time": "^2.3.2",
     "serve-favicon": "^2.3.2",
     "serve-index": "^1.8.0",
