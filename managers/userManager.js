@@ -1,5 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
+const path = require('path');
 const session = require('express-session');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
@@ -8,6 +9,7 @@ const bodyParser = require('body-parser');
 // Create a router for this manager
 var router = express.Router();
 router.use(bodyParser.urlencoded({ extended: true }));
+
 //use sessions for tracking logins
 router.use(
   session({
@@ -85,7 +87,8 @@ router.get('/', sessionChecker, (req, res) => {
 router.get('/dashboard', (req, res) => {
   if (req.session.user && req.cookies.user_sid) {
     console.log(req.session);
-    res.sendFile(__dirname + '/client/dashboard.html');
+    // res.sendFile(path.join(__dirname + '/../views/dashboard.html'));
+    res.render('dashboard', { user: req.session.user });
   } else {
     res.redirect('/login');
   }
@@ -114,7 +117,7 @@ router.get('/user/:id', (req, res) => {
 router
   .route('/signup')
   .get(sessionChecker, (req, res) => {
-    res.sendFile(__dirname + '/client/signup.html');
+    res.sendFile(path.join(__dirname + '/../views/signup.html'));
   })
   .post(function(req, res) {
     console.log('Creating user');
@@ -145,7 +148,7 @@ router
 router
   .route('/login')
   .get(sessionChecker, (req, res) => {
-    res.sendFile(__dirname + '/client/login.html');
+    res.sendFile(path.join(__dirname + '/../views/login.html'));
   })
   .post(function(req, res) {
     username = req.body.username;

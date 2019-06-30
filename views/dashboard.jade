@@ -1,0 +1,26 @@
+html
+  head
+    title Login Here
+  body.container
+    .page-header
+      h1 My City
+    nav.navbar.navbar-default
+      .container-fluid
+        // Collect the nav links, forms, and other content for toggling
+        #bs-example-navbar-collapse-1.collapse.navbar-collapse
+          ul.nav.navbar-nav
+            li
+              a(href='/') Home
+            li
+              a(href='/signup') Sign Up
+            li
+              a(href='/dashboard') Dashboard
+          ul.nav.navbar-nav.navbar-right
+            li
+              a(href='/login') Log In
+            li
+              a(href='/logout') Log Out
+        // /.navbar-collapse
+        // /.container-fluid
+    .container.row
+      h1 Hi, Welcome to #{user.username} Dashboard
