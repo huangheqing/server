@@ -1,0 +1,8 @@
+.terminal div {
+  margin-bottom: 10px;
+}
+
+.terminal-output,
+.cmd {
+  font-size: 2em !important;
+}

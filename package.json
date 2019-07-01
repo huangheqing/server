@@ -45,6 +45,7 @@
     "hbs": "^4.0.1",
     "helmet": "^3.9.0",
     "jade": "^1.11.0",
+    "jquery.terminal": "^2.6.3",
     "jshint": "^2.10.2",
     "loadware": "^2.0.0",
     "log": "^1.4.0",
@@ -59,7 +60,9 @@
     "response-time": "^2.3.2",
     "serve-favicon": "^2.3.2",
     "serve-index": "^1.8.0",
-    "socket.io": "^2.0.3"
+    "socket.io": "^2.0.3",
+    "xterm": "^3.14.4",
+    "xterm-addon-web-links": "^0.1.0"
   },
   "devDependencies": {
     "eslint": "^4.7.2",
