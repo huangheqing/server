@@ -5,6 +5,7 @@ html
     link(href='https://unpkg.com/jquery.terminal@1.x.x/css/jquery.terminal.min.css', rel='stylesheet')
     link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css', integrity='sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u', crossorigin='anonymous')
     script(src='js/jquery.mousewheel-min.js')
+    script(src='/js/dashboard.js')
     title Login Here
   body.container
     .page-header
@@ -31,26 +32,4 @@ html
       h1 Hi, Welcome to #{user.username} Dashboard
     #terminal(style='background-color:black')
       script.
-        (function($, undefined) {
-        $('#terminal').terminal(function(command) {
-        if (command !== '') {
-        try {
-        var result = window.eval(command);
-        if (result !== undefined) {
-        this.echo(new String(result));
-        }
-        } catch(e) {
-        this.error(new String(e));
-        }
-        } else {
-        this.echo('');
-        }
-        }, 
-        {
-        greetings: 'Hello, welcome to the City',
-        name: 'city_terminal',
-        height: 500,
-        width: 500,
-        prompt: '$> '
-        });
-        })(jQuery);
+        (terminalFun())(jQuery);
