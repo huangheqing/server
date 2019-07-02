@@ -1,6 +1,5 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const path = require('path');
 const session = require('express-session');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
@@ -87,7 +86,6 @@ router.get('/', sessionChecker, (req, res) => {
 router.get('/dashboard', (req, res) => {
   if (req.session.user && req.cookies.user_sid) {
     console.log(req.session);
-    // res.sendFile(path.join(__dirname + '/../views/dashboard.html'));
     res.render('dashboard', { user: req.session.user });
   } else {
     res.redirect('/login');
@@ -113,11 +111,10 @@ router.get('/user/:id', (req, res) => {
 });
 
 // Function to create user
-// Need to use bodyParser.json() to tell this endpoint to accept Json post request
 router
   .route('/signup')
   .get(sessionChecker, (req, res) => {
-    res.sendFile(path.join(__dirname + '/../views/signup.html'));
+    res.render('signup');
   })
   .post(function(req, res) {
     console.log('Creating user');
@@ -135,7 +132,7 @@ router
         console.log('Inserting');
         if (err) {
           console.log(err);
-          return next(err);
+          return res.redirect('/signup');
         } else {
           return res.redirect('/login');
         }
@@ -148,7 +145,7 @@ router
 router
   .route('/login')
   .get(sessionChecker, (req, res) => {
-    res.sendFile(path.join(__dirname + '/../views/login.html'));
+    res.render('login');
   })
   .post(function(req, res) {
     username = req.body.username;
