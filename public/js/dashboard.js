@@ -1,29 +1,21 @@
-function terminalFun() {
+jQuery(function($) {
+  var currMenu = 'help';
+  $.getScript('/js/commands.js');
+
   $('#terminal').terminal(
     function(command) {
-      if (command !== '') {
-        try {
-          var result = window.eval(command);
-          if (result !== undefined) {
-            this.echo(new String(result));
-          }
-        } catch (e) {
-          this.error(new String(e));
-        }
+      if (command == 'help') {
+        return menu;
       } else {
-        this.echo('');
+        return parseCommand(command);
       }
     },
     {
-      greetings: 'Hello, welcome to the City, use -h to see the options',
+      greetings: 'Hello, welcome to the City, use help to see the options',
       name: 'city_terminal',
       height: 500,
       width: 500,
       prompt: '$> ',
     }
   );
-}
-
-function menu() {}
-
-function parseCommand() {}
+});
