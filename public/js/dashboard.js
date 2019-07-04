@@ -1,7 +1,6 @@
 jQuery(function($) {
   var currMenu = 'help';
   $.getScript('/js/commands.js');
-
   $('#terminal').terminal(
     function(command) {
       if (command == 'help') {

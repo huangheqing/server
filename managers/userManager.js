@@ -9,17 +9,6 @@ const bodyParser = require('body-parser');
 var router = express.Router();
 router.use(bodyParser.urlencoded({ extended: true }));
 
-//use sessions for tracking logins
-router.use(
-  session({
-    key: 'user_sid',
-    secret: 'work hard',
-    resave: false,
-    saveUninitialized: false,
-    cookie: { expires: 6000000000 },
-  })
-);
-router.use(cookieParser());
 router.use((req, res, next) => {
   if (req.cookies.user_sid && !req.session.user) {
     res.clearCookie('user_sid');
@@ -34,9 +23,6 @@ var sessionChecker = (req, res, next) => {
     next();
   }
 };
-
-// Mongoose schema for user
-mongoose.connect('mongodb://localhost:27017/city');
 
 // Creation on schema
 var UserSchema = new mongoose.Schema({
@@ -56,8 +42,6 @@ var UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  exp: Number,
-  Money: Number,
 });
 
 //hashing a password before saving it to the database

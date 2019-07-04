@@ -1,13 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const util = require('util');
 
 // Create a router for this manager
 var router = express.Router();
 router.use(bodyParser.urlencoded({ extended: true }));
-
-// Mongoose schema for user
-mongoose.connect('mongodb://localhost:27017/city');
 
 // Creation on schema
 var UserStatsSchema = new mongoose.Schema({
@@ -18,7 +16,7 @@ var UserStatsSchema = new mongoose.Schema({
     trim: true,
   },
   exp: Number,
-  Money: Number,
+  money: Number,
 });
 
 // Create table + model
@@ -28,16 +26,30 @@ module.exports = UserStats;
 // Export this router so the server entry point can call it
 module.exports = router;
 
-router.get('/stats/:username', (req, res) => {
-  // the :id can be retrieved by calling request.params.username
-  UserStats.find({ username: req.params.username }, function(err, user) {
-    console.log('get stats by name');
-    if (err) {
+// This endpoint is for getting your own user stats data,
+// Rely on the session data to retrieve current logged in user
+router.get('/stats', (req, res) => {
+  UserStats.findOne({ username: req.session.user.username }, function(
+    err,
+    user
+  ) {
+    console.log('get stats by id');
+    if (err || user == null) {
       console.log(err);
-      return next(err);
+      var newUser = {
+        username: req.session.user.username,
+        exp: 0,
+        money: 100,
+      };
+      UserStats.create(newUser);
+      res.send(
+        util.format('user name: %s money: %s ', newUser.username, newUser.money)
+      );
     } else {
-      UserStats.create({ username: req.params.username });
-      res.send(user);
+      console.log(user);
+      res.send(
+        util.format('user name: %s money: %s ', user.username, user.money)
+      );
     }
   });
 });
