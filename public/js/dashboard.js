@@ -4,7 +4,12 @@ jQuery(function($) {
   $('#terminal').terminal(
     function(command) {
       if (command == 'help') {
-        return menu;
+        var supportedCommands = '';
+        for (var key in menu) {
+          var value = menu[key];
+          supportedCommands += key + ' (' + value + ') \n';
+        }
+        return supportedCommands;
       } else {
         return parseCommand(command);
       }

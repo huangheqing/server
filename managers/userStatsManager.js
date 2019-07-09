@@ -15,8 +15,17 @@ var UserStatsSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
-  exp: Number,
   money: Number,
+  career: {
+    careerKind: String,
+    level: Number,
+  },
+  bag: [
+    {
+      itemName: String,
+      amount: Number,
+    },
+  ],
 });
 
 // Create table + model
@@ -38,18 +47,52 @@ router.get('/stats', (req, res) => {
       console.log(err);
       var newUser = {
         username: req.session.user.username,
-        exp: 0,
         money: 100,
       };
       UserStats.create(newUser);
       res.send(
-        util.format('user name: %s money: %s ', newUser.username, newUser.money)
+        util.format(
+          'user_name: %s, money: %s ',
+          newUser.username,
+          newUser.money
+        )
       );
     } else {
       console.log(user);
       res.send(
-        util.format('user name: %s money: %s ', user.username, user.money)
+        util.format('user_name: %s, money: %s ', user.username, user.money)
       );
     }
   });
+});
+
+router.get('/stats/career', (req, res) => {
+  UserStats.findOne({ username: req.session.user.username }, function(
+    err,
+    user
+  ) {
+    if (err || user == null) {
+      res.send(null);
+    } else {
+      console.log(user);
+      res.send(user);
+    }
+  });
+});
+
+router.put('/stats', (req, res) => {
+  UserStats.update(
+    query,
+    {
+      $set: {
+        username: req.session.user.username,
+        career: {
+          careerKind: req.body.careerKind,
+          level: req.body.level,
+        },
+      },
+    },
+    options,
+    callback
+  );
 });
