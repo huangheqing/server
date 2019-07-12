@@ -6,21 +6,23 @@ const menu = {
 };
 $.getScript('/js/stats.js');
 $.getScript('/js/career.js');
-function parseCommand(command) {
+function parseCommand(command, terminal) {
   try {
     var supported = false;
-    for (var key in menu) {
-      if (command == key) {
-        // command supported
-        // Going to proceed for next step
-        if (command == '-s') {
-          supported = true;
-          return handleStats();
-        } else if (command.includes('-c')) {
-          supported = true;
-          return handleCareer();
-        }
-      }
+    // command supported
+    // Going to proceed for next step
+    if (command == '-s') {
+      supported = true;
+      return handleStats();
+    } else if (command.includes('-c')) {
+      supported = true;
+      return handleCareer(command);
+    } else if (command.includes('-en')) {
+      supported = true;
+      return 'No Op';
+    } else if (command.includes('-i')) {
+      supported = true;
+      return 'No Op';
     }
     if (supported == false) {
       return 'Command not supported';

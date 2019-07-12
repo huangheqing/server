@@ -74,25 +74,23 @@ router.get('/stats/career', (req, res) => {
     if (err || user == null) {
       res.send(null);
     } else {
-      console.log(user);
-      res.send(user);
+      console.log(user.career);
+      res.send(user.career);
     }
   });
 });
 
-router.put('/stats', (req, res) => {
-  UserStats.update(
-    query,
-    {
-      $set: {
-        username: req.session.user.username,
-        career: {
-          careerKind: req.body.careerKind,
-          level: req.body.level,
-        },
-      },
-    },
-    options,
-    callback
+router.post('/stats/career', (req, res) => {
+  console.log(req.session.user.username);
+  console.log(req.body.careerKind);
+  console.log(req.body.level);
+  UserStats.findOneAndUpdate(
+    { username: req.session.user.username },
+    { career: { careerKind: req.body.careerKind, level: req.body.level } },
+    { upsert: true },
+    function(err, doc) {
+      if (err) return res.send(500, { error: err });
+      return res.send('succesfully saved');
+    }
   );
 });

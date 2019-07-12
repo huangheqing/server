@@ -2,7 +2,7 @@ jQuery(function($) {
   var currMenu = 'help';
   $.getScript('/js/commands.js');
   $('#terminal').terminal(
-    function(command) {
+    function(command, terminal) {
       if (command == 'help') {
         var supportedCommands = '';
         for (var key in menu) {
@@ -11,7 +11,7 @@ jQuery(function($) {
         }
         return supportedCommands;
       } else {
-        return parseCommand(command);
+        return parseCommand(command, terminal);
       }
     },
     {
