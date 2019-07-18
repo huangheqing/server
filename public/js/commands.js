@@ -3,9 +3,11 @@ const menu = {
   '-c': 'career',
   '-en': 'entertainment',
   '-i': 'investment',
+  '-l': 'leaderboard',
 };
 $.getScript('/js/stats.js');
 $.getScript('/js/career.js');
+$.getScript('/js/entertainment.js');
 function parseCommand(command, terminal) {
   try {
     var supported = false;
@@ -19,7 +21,7 @@ function parseCommand(command, terminal) {
       return handleCareer(command);
     } else if (command.includes('-en')) {
       supported = true;
-      return 'No Op';
+      return handleEntertainment(command, terminal);
     } else if (command.includes('-i')) {
       supported = true;
       return 'No Op';

@@ -23,7 +23,6 @@ function handleCareer(command) {
     if (career == null) {
       return (
         "You don't have a career right now," +
-        'please use one of the following command to pick a career(You can only pick once!): \n' +
         'Farm: -c -pick farm \n' +
         'Manufacture: -c -pick manufacture \n' +
         'Science: -c -pick science \n' +
