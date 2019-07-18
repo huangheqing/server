@@ -1,35 +1,64 @@
 const careers = ['farm', 'manufacture', 'science', 'hospitality'];
-function handleCareer(command) {
+function handleCareer(command, terminal) {
   // If this is a create command then we are going to assgien career to this player
-  var res = command.split(' ');
-  if (res.length == 3 && res.includes('-c') && res.includes('-pick')) {
-    var pickCareer = 'Not supported';
+  var career = $.ajax({
+    type: 'GET',
+    url: '/stats/career',
+    async: false,
+  }).responseText;
+  // $.get('/stats/career', function(data) {
+  //     return data;
+  //   });
+  debugger;
+  if (career == null || career == '{}') {
+    var history = terminal.history();
     careers.forEach(element => {
-      if (res.includes(element)) {
-        // Perform a create to user stats collection
-        pickCareer = 'You are now doing: ' + element;
-        $.ajax({
-          url: '/stats/career',
-          type: 'POST',
-          data: { careerKind: element, level: 1 },
-        });
+      terminal.echo(element);
+    });
+    terminal.push(
+      function(command) {
+        var pickedCareer;
+        if (command.match(/^(farm)$/i)) {
+          pickedCareer = pickACareer('farm');
+          terminal.pop();
+          history.enable();
+        } else if (command.match(/^(manufacture)$/i)) {
+          pickedCareer = pickACareer('manufacture');
+          terminal.pop();
+          history.enable();
+        } else if (command.match(/^(science)$/i)) {
+          pickedCareer = pickACareer('science');
+          terminal.pop();
+          history.enable();
+        } else if (command.match(/^(hospitality)$/i)) {
+          pickedCareer = pickACareer('hospitality');
+          terminal.pop();
+          history.enable();
+        } else {
+          terminal.echo('You must pick one');
+        }
+        terminal.echo(pickedCareer);
+      },
+      {
+        prompt: "You don't have a career at this point, please pick one: ",
       }
-    });
-    return pickCareer;
+    );
   } else {
-    var career = $.get('/stats/career', function(data) {
-      return data;
-    });
-    if (career == null) {
-      return (
-        "You don't have a career right now," +
-        'Farm: -c -pick farm \n' +
-        'Manufacture: -c -pick manufacture \n' +
-        'Science: -c -pick science \n' +
-        'Hospitality: -c -pick hospitality \n'
-      );
-    } else {
-      return career;
-    }
+    return career;
   }
+}
+function pickACareer(career) {
+  var pickCareer = 'Not supported';
+  careers.forEach(element => {
+    if (career == element) {
+      // Perform a create to user stats collection
+      pickCareer = 'You are now doing: ' + element;
+      $.ajax({
+        url: '/stats/career',
+        type: 'POST',
+        data: { careerKind: element, level: 1 },
+      });
+    }
+  });
+  return pickCareer;
 }

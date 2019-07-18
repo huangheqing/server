@@ -71,8 +71,9 @@ router.get('/stats/career', (req, res) => {
     err,
     user
   ) {
-    if (err || user == null) {
-      res.send(null);
+    if (err || user == null || user.career == '{}') {
+      console.log('career is null or empty for ' + username);
+      res.send({});
     } else {
       console.log(user.career);
       res.send(user.career);
@@ -87,7 +88,7 @@ router.post('/stats/career', (req, res) => {
   UserStats.findOneAndUpdate(
     { username: req.session.user.username },
     { career: { careerKind: req.body.careerKind, level: req.body.level } },
-    { upsert: true },
+    { upsert: true, useFindAndModify: false },
     function(err, doc) {
       if (err) return res.send(500, { error: err });
       return res.send('succesfully saved');

@@ -18,7 +18,7 @@ function parseCommand(command, terminal) {
       return handleStats();
     } else if (command.includes('-c')) {
       supported = true;
-      return handleCareer(command);
+      return handleCareer(command, terminal);
     } else if (command.includes('-en')) {
       supported = true;
       return handleEntertainment(command, terminal);
