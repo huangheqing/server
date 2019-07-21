@@ -19,6 +19,7 @@ var sessionMiddleWare = session({
 
 var users = require('./managers/userManager');
 var userStats = require('./managers/userStatsManager');
+var items = require('./managers/itemsManager');
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'jade');
@@ -27,6 +28,7 @@ app.use(cookieParser());
 // Register the routes into server
 app.use(users);
 app.use(userStats);
+app.use(items);
 
 app.listen(port, err => {
   if (err) {

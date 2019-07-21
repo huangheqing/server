@@ -4,10 +4,12 @@ const menu = {
   '-en': 'entertainment',
   '-i': 'investment',
   '-l': 'leaderboard',
+  '-hu': 'hunt',
 };
 $.getScript('/js/stats.js');
 $.getScript('/js/career.js');
 $.getScript('/js/entertainment.js');
+$.getScript('/js/items.js');
 function parseCommand(command, terminal) {
   try {
     var supported = false;
@@ -25,6 +27,9 @@ function parseCommand(command, terminal) {
     } else if (command.includes('-i')) {
       supported = true;
       return 'No Op';
+    } else if (command == '-hu') {
+      supported = true;
+      return handleHunt(command, terminal);
     }
     if (supported == false) {
       return 'Command not supported';

@@ -1,8 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const session = require('express-session');
 const mongoose = require('mongoose');
-const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
 // Create a router for this manager

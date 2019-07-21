@@ -1,4 +1,4 @@
-const careers = ['farm', 'manufacture', 'science', 'hospitality'];
+const careers = ['farm', 'manufacture', 'science', 'restaurant'];
 function handleCareer(command, terminal) {
   // If this is a create command then we are going to assgien career to this player
   var career = $.ajax({
@@ -6,10 +6,6 @@ function handleCareer(command, terminal) {
     url: '/stats/career',
     async: false,
   }).responseText;
-  // $.get('/stats/career', function(data) {
-  //     return data;
-  //   });
-  debugger;
   if (career == null || career == '{}') {
     var history = terminal.history();
     careers.forEach(element => {
@@ -30,7 +26,7 @@ function handleCareer(command, terminal) {
           pickedCareer = pickACareer('science');
           terminal.pop();
           history.enable();
-        } else if (command.match(/^(hospitality)$/i)) {
+        } else if (command.match(/^(restaurant)$/i)) {
           pickedCareer = pickACareer('hospitality');
           terminal.pop();
           history.enable();
