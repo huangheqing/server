@@ -60,7 +60,13 @@ router.get('/stats', (req, res) => {
     } else {
       console.log(user);
       res.send(
-        util.format('user_name: %s, money: %s ', user.username, user.money)
+        util.format(
+          'user_name: %s, money: %s , bag: %s, career: %s',
+          user.username,
+          user.money,
+          user.bag,
+          user.career
+        )
       );
     }
   });
@@ -81,7 +87,7 @@ router.get('/stats/career', (req, res) => {
   });
 });
 
-router.post('/stats/career', (req, res) => {
+router.put('/stats/career', (req, res) => {
   console.log(req.session.user.username);
   console.log(req.body.careerKind);
   console.log(req.body.level);
@@ -94,4 +100,38 @@ router.post('/stats/career', (req, res) => {
       return res.send('succesfully saved');
     }
   );
+});
+
+router.put('/stats/items/add', (req, res) => {
+  var itemNeedToUpdate = req.body;
+  UserStats.findOne({ username: req.session.user.username }, function(
+    err,
+    user
+  ) {
+    var amount = parseInt(itemNeedToUpdate.amount);
+    var newBag = [];
+    var currBag = user.bag;
+    for (var i in currBag) {
+      if (currBag[i].itemName == itemNeedToUpdate.itemName) {
+        amount += parseInt(currBag[i].amount);
+      } else if (currBag[i].itemName != null && currBag[i].amount != null) {
+        newBag.push(currBag[i]);
+      }
+    }
+    newBag.push({ itemName: itemNeedToUpdate.itemName, amount: amount });
+    console.log(newBag);
+    UserStats.findOneAndUpdate(
+      {
+        username: req.session.user.username,
+      },
+      {
+        bag: newBag,
+      },
+      { upsert: true, useFindAndModify: false },
+      function(err, doc) {
+        if (err) return res.status(500).send({ error: err });
+        return res.send('succesfully saved');
+      }
+    );
+  });
 });

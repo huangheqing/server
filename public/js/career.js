@@ -51,7 +51,7 @@ function pickACareer(career) {
       pickCareer = 'You are now doing: ' + element;
       $.ajax({
         url: '/stats/career',
-        type: 'POST',
+        type: 'PUT',
         data: { careerKind: element, level: 1 },
       });
     }

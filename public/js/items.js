@@ -20,6 +20,11 @@ function handleHunt(command, terminal) {
         async: false,
       }).responseJSON;
       if (huntedItems.amount > 0) {
+        $.ajax({
+          url: '/stats/items/add',
+          type: 'PUT',
+          data: { itemName: huntedItems.item, amount: huntedItems.amount },
+        });
         terminal.echo(
           'You just found: ' + huntedItems.item + ' * ' + huntedItems.amount
         );
